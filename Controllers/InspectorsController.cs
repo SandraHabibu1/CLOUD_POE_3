@@ -1,0 +1,165 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using CLOUD_POE_3.Data;
+using CLOUD_POE_3.Models;
+using Microsoft.AspNetCore.Authorization;
+
+namespace CLOUD_POE_3.Controllers
+{
+    [Authorize]
+    public class InspectorsController : Controller
+    {
+        private readonly ApplicationDbContext _context;
+
+        public InspectorsController(ApplicationDbContext context)
+        {
+            _context = context;
+        }
+
+        // GET: Inspectors
+        public async Task<IActionResult> Index()
+        {
+              return _context.Inspector != null ? 
+                          View(await _context.Inspector.ToListAsync()) :
+                          Problem("Entity set 'ApplicationDbContext.Inspector'  is null.");
+        }
+
+        // GET: Inspectors/Details/5
+        public async Task<IActionResult> Details(string id)
+        {
+            if (id == null || _context.Inspector == null)
+            {
+                return NotFound();
+            }
+
+            var inspector = await _context.Inspector
+                .FirstOrDefaultAsync(m => m.InspectorNo == id);
+            if (inspector == null)
+            {
+                return NotFound();
+            }
+
+            return View(inspector);
+        }
+
+        // GET: Inspectors/Create
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+        // POST: Inspectors/Create
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create([Bind("InspectorNo,InspectorName,InspectorEmail,InspectorMobile")] Inspector inspector)
+        {
+            if (ModelState.IsValid)
+            {
+                _context.Add(inspector);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            return View(inspector);
+        }
+
+        // GET: Inspectors/Edit/5
+        public async Task<IActionResult> Edit(string id)
+        {
+            if (id == null || _context.Inspector == null)
+            {
+                return NotFound();
+            }
+
+            var inspector = await _context.Inspector.FindAsync(id);
+            if (inspector == null)
+            {
+                return NotFound();
+            }
+            return View(inspector);
+        }
+
+        // POST: Inspectors/Edit/5
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(string id, [Bind("InspectorNo,InspectorName,InspectorEmail,InspectorMobile")] Inspector inspector)
+        {
+            if (id != inspector.InspectorNo)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _context.Update(inspector);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!InspectorExists(inspector.InspectorNo))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            return View(inspector);
+        }
+
+        // GET: Inspectors/Delete/5
+        public async Task<IActionResult> Delete(string id)
+        {
+            if (id == null || _context.Inspector == null)
+            {
+                return NotFound();
+            }
+
+            var inspector = await _context.Inspector
+                .FirstOrDefaultAsync(m => m.InspectorNo == id);
+            if (inspector == null)
+            {
+                return NotFound();
+            }
+
+            return View(inspector);
+        }
+
+        // POST: Inspectors/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(string id)
+        {
+            if (_context.Inspector == null)
+            {
+                return Problem("Entity set 'ApplicationDbContext.Inspector'  is null.");
+            }
+            var inspector = await _context.Inspector.FindAsync(id);
+            if (inspector != null)
+            {
+                _context.Inspector.Remove(inspector);
+            }
+            
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+        private bool InspectorExists(string id)
+        {
+          return (_context.Inspector?.Any(e => e.InspectorNo == id)).GetValueOrDefault();
+        }
+    }
+}

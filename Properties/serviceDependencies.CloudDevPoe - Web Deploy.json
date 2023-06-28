@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "mssql5": {
+      "secretStore": "AzureAppSettings",
+      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.Sql/servers/cloudb/databases/CloudDb",
+      "type": "mssql.azure",
+      "connectionId": "CloudDBconnectionstring1"
+    }
+  }
+}
